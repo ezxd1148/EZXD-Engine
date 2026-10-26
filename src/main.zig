@@ -86,7 +86,7 @@ pub fn main(init: std.process.Init) !void {
             }
         }
 
-        if (!sdl.SDL_Vulkan_CreateSurface(window, &sdl.VkInstance, null, &sdl.VK_KHR_surface)) {
+        if (!sdl.SDL_Vulkan_CreateSurface(window, @constCast(&sdl.VkInstance), null, @constCast(&sdl.VK_KHR_surface))) {
             std.debug.print("Error on creating surface: {s}\n", .{sdl.SDL_GetError()});
         }
 
@@ -104,4 +104,37 @@ pub fn main(init: std.process.Init) !void {
         //
         sdl.SDL_Delay(10);
     }
+}
+
+fn createInstance() !sdl.VkInstance {
+    var extension_count: u32 = 0;
+    const extensions = sdl.SDL_Vulkan_GetInstanceExtensions(&extension_count);
+
+    if (extensions == null) {
+        std.debug.print("Error on getting instance: {s}\n", .{sdl.SDL_GetError()});
+        return error.VulkanExtensionsUnavailable;
+    }
+
+    var app_info = std.mem.zeroes(sdl.VkApplicationInfo);
+    app_info.sType = sdl.VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    app_info.pApplicationName = "EZXD Fun Game";
+    app_info.pEngineName = "EZXD Engine";
+    app_info.apiVersion = sdl.VK_API_VERSION_1_3;
+
+    var create_info = std.mem.zeroes(sdl.VkInstanceInfo);
+    create_info.sType = sdl.VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    create_info.pApplicationInfo = &app_info;
+    create_info.enabledExtensionCount = extension_count;
+    create_info.ppEnabledExtensionNames = extensions;
+
+    var instance: sdl.VkInstance = undefined;
+
+    const result = sdl.vkCreateInstance(&create_info, null, &instance);
+
+    if (result != sdl.VK_SUCCESS) {
+        std.debug.print("vkCreateInstance failed: {d}\n", .{result});
+        return error.InstanceCreationFailed;
+    }
+
+    return instance;
 }
