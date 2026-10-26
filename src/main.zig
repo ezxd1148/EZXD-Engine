@@ -27,6 +27,8 @@ pub fn main(init: std.process.Init) !void {
     };
     defer sdl.SDL_DestroyWindow(window);
 
+    std.debug.print("Window Created\n", .{});
+
     // vulkan renderer
     var extension_count: u32 = 0;
 
@@ -48,13 +50,22 @@ pub fn main(init: std.process.Init) !void {
         }
     }
 
+    const instance = try createInstance();
+    defer sdl.vkDestroyInstance(instance, null);
+
+    var surface: sdl.VkSurfaceKHR = undefined;
+
+    if (!sdl.SDL_Vulkan_CreateSurface(window, instance, null, &surface)) {
+        std.debug.print("Surface creation failed: {s}\n", .{sdl.SDL_GetError()});
+        return error.SurfaceCreationFailed;
+    }
+    defer sdl.vkDestroySurfaceKHR(instance, surface, null);
+
     //const renderer = sdl.SDL_CreateRenderer(window, null) orelse {
     //    std.debug.print("SDL_CreateRenderer failed: {s}\n", .{sdl.SDL_GetError()});
     //    return error.RendererCreationFailed;
     //};
     //defer sdl.SDL_DestroyRenderer(renderer);
-
-    std.debug.print("Window Created\n", .{});
 
     //const count_instance_extensions: [*c]u32 = undefined;
     //const instance_extensions = sdl.SDL_Vulkan_GetInstanceExtensions(count_instance_extensions);
@@ -104,6 +115,17 @@ pub fn main(init: std.process.Init) !void {
         //
         sdl.SDL_Delay(10);
     }
+}
+
+fn createSurface(window: *sdl.SDL_Window, instance: sdl.Instance) !sdl.SurfaceKHR {
+    var surface: sdl.SurfaceKHR = undefined;
+
+    if (!sdl.SDL_Vulkan_CreateSurface(window, @ptrCast(instance), null, @ptrCast(&surface))) {
+        std.debug.print("Surface Creation has failed: {s}\n", .{sdl.SDL_GetError()});
+        return error.SurfaceCreationFailed;
+    }
+
+    return surface;
 }
 
 fn createInstance() !sdl.VkInstance {
