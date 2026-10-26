@@ -131,6 +131,14 @@ pub fn build(b: *std.Build) void {
         .link_libc = true,
     }));
 
+    exe.root_module.addImport("vulkan", b.createModule(.{
+        .root_source_file = b.path("src/sdl.zig"),
+        .target = target,
+        .optimize = optimize,
+        .link_libc = true,
+    }));
+
+    exe.root_module.linkSystemLibrary("vulkan", .{});
     exe.root_module.linkSystemLibrary("SDL3", .{});
 
     // Creates an executable that will run `test` blocks from the executable's
