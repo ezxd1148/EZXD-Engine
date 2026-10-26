@@ -12,6 +12,9 @@ pub fn main(init: std.process.Init) !void {
     defer sdl.SDL_Quit();
 
     std.debug.print("SDL Initialized\n", .{});
+
+    std.debug.print("Video driver: {s}\n", .{sdl.SDL_GetCurrentVideoDriver()}); // Im using wayland
+
     const window = sdl.SDL_CreateWindow(
         "EZXD Engine",
         1280,
@@ -22,6 +25,12 @@ pub fn main(init: std.process.Init) !void {
         return error.WindowCreationFailed;
     };
     defer sdl.SDL_DestroyWindow(window);
+
+    const renderer = sdl.SDL_CreateRenderer(window, null) orelse {
+        std.debug.print("SDL_CreateRenderer failed: {s}\n", .{sdl.SDL_GetError()});
+        return error.RendererCreationFailed;
+    };
+    defer sdl.SDL_DestroyRenderer(renderer);
 
     std.debug.print("Window Created\n", .{});
 
@@ -35,6 +44,16 @@ pub fn main(init: std.process.Init) !void {
             }
         }
 
-        sdl.SDL_Delay(10);
+        if (!sdl.SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255)) {
+            std.debug.print("Error while rending color {s}\n", .{sdl.SDL_GetError()});
+        }
+
+        if (!sdl.SDL_RenderClear(renderer)) {
+            std.debug.print("Error while Clearing Render: {s}\n", .{sdl.SDL_GetError()});
+        }
+
+        if (!sdl.SDL_RenderPresent(renderer)) {
+            std.debug.print("Error while presenting render: {s}\n", .{sdl.SDL_GetError()});
+        }
     }
 }
