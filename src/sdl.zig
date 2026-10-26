@@ -2072,6 +2072,7 @@ pub const struct_SDL_Window = opaque {
     pub const SDL_Metal_CreateView = __root.SDL_Metal_CreateView;
     pub const SDL_CreateRenderer = __root.SDL_CreateRenderer;
     pub const SDL_GetRenderer = __root.SDL_GetRenderer;
+    pub const SDL_Vulkan_CreateSurface = __root.SDL_Vulkan_CreateSurface;
     pub const GetDisplayForWindow = __root.SDL_GetDisplayForWindow;
     pub const GetWindowPixelDensity = __root.SDL_GetWindowPixelDensity;
     pub const GetWindowDisplayScale = __root.SDL_GetWindowDisplayScale;
@@ -2156,6 +2157,7 @@ pub const struct_SDL_Window = opaque {
     pub const CreateView = __root.SDL_Metal_CreateView;
     pub const CreateRenderer = __root.SDL_CreateRenderer;
     pub const GetRenderer = __root.SDL_GetRenderer;
+    pub const CreateSurface = __root.SDL_Vulkan_CreateSurface;
 };
 pub const SDL_Window = struct_SDL_Window;
 pub const SDL_WindowFlags = Uint64;
@@ -5857,6 +5859,25 @@ pub extern fn SDL_GetTrayMenuParentTray(menu: ?*SDL_TrayMenu) ?*SDL_Tray;
 pub extern fn SDL_UpdateTrays() void;
 pub extern fn SDL_GetVersion() c_int;
 pub extern fn SDL_GetRevision() [*c]const u8;
+pub const struct_VkInstance_T = opaque {
+    pub const SDL_Vulkan_DestroySurface = __root.SDL_Vulkan_DestroySurface;
+    pub const SDL_Vulkan_GetPresentationSupport = __root.SDL_Vulkan_GetPresentationSupport;
+    pub const DestroySurface = __root.SDL_Vulkan_DestroySurface;
+    pub const GetPresentationSupport = __root.SDL_Vulkan_GetPresentationSupport;
+};
+pub const VkInstance = ?*struct_VkInstance_T;
+pub const struct_VkPhysicalDevice_T = opaque {};
+pub const VkPhysicalDevice = ?*struct_VkPhysicalDevice_T;
+pub const struct_VkSurfaceKHR_T = opaque {};
+pub const VkSurfaceKHR = ?*struct_VkSurfaceKHR_T;
+pub const struct_VkAllocationCallbacks = opaque {};
+pub extern fn SDL_Vulkan_LoadLibrary(path: [*c]const u8) bool;
+pub extern fn SDL_Vulkan_GetVkGetInstanceProcAddr() SDL_FunctionPointer;
+pub extern fn SDL_Vulkan_UnloadLibrary() void;
+pub extern fn SDL_Vulkan_GetInstanceExtensions(count: [*c]Uint32) [*c]const [*c]const u8;
+pub extern fn SDL_Vulkan_CreateSurface(window: ?*SDL_Window, instance: VkInstance, allocator: ?*const struct_VkAllocationCallbacks, surface: [*c]VkSurfaceKHR) bool;
+pub extern fn SDL_Vulkan_DestroySurface(instance: VkInstance, surface: VkSurfaceKHR, allocator: ?*const struct_VkAllocationCallbacks) void;
+pub extern fn SDL_Vulkan_GetPresentationSupport(instance: VkInstance, physicalDevice: VkPhysicalDevice, queueFamilyIndex: Uint32) bool;
 
 pub const __VERSION__ = "Aro aro-zig";
 pub const __Aro__ = "";
@@ -9934,9 +9955,14 @@ pub const SDL_WINDOW_SHOWN = @compileError("unable to translate macro: undefined
 // /usr/include/SDL3/SDL_oldnames.h:1334:9
 pub const SDL_WINDOW_SKIP_TASKBAR = @compileError("unable to translate macro: undefined identifier `SDL_WINDOW_SKIP_TASKBAR_renamed_SDL_WINDOW_UTILITY`");
 // /usr/include/SDL3/SDL_oldnames.h:1335:9
+pub const SDL_vulkan_h_ = "";
 pub const __locale_struct = struct___locale_struct;
 pub const _IO_FILE = struct__IO_FILE;
 pub const tm = struct_tm;
 pub const SDL_iconv_data_t = struct_SDL_iconv_data_t;
 pub const SDL_GLContextState = struct_SDL_GLContextState;
 pub const _XEvent = union__XEvent;
+pub const VkInstance_T = struct_VkInstance_T;
+pub const VkPhysicalDevice_T = struct_VkPhysicalDevice_T;
+pub const VkSurfaceKHR_T = struct_VkSurfaceKHR_T;
+pub const VkAllocationCallbacks = struct_VkAllocationCallbacks;

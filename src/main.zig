@@ -19,7 +19,7 @@ pub fn main(init: std.process.Init) !void {
         "EZXD Engine",
         1280,
         720,
-        sdl.SDL_WINDOW_VULKAN | sdl.SDL_WINDOW_RESIZABLE,
+        sdl.SDL_WINDOW_VULKAN | sdl.SDL_WINDOW_RESIZABLE, // called vulkan here
     ) orelse {
         std.debug.print("SDL_CreateWindow failed: {s}\n", .{sdl.SDL_GetError()});
         return error.WindowCreationFailed;
@@ -33,6 +33,26 @@ pub fn main(init: std.process.Init) !void {
     defer sdl.SDL_DestroyRenderer(renderer);
 
     std.debug.print("Window Created\n", .{});
+
+    const count_instance_extensions: [*c]u32 = undefined;
+    const instance_extensions = sdl.SDL_Vulkan_GetInstanceExtensions(count_instance_extensions);
+    if (instance_extensions == null) {
+        std.debug.print("Error on vulkan instance: {s}\n", .{sdl.SDL_GetError()});
+    }
+
+    // from here
+    const count_extensions = count_instance_extensions + 1;
+    const extensions = sdl.SDL_malloc(count_extensions * @sizeOf(c_char));
+    extensions[0] = sdl.VK_EXT_DEBUG_REPORT_EXTENSION_NAME;
+    sdl.SDL_memcpy(&extensions[1], instance_extensions, count_instance_extensions * @sizeOf(c_char));
+
+    const create_info = struct {};
+    create_info.enabledExtensionCount = count_extensions;
+    create_info.ppEnabledExtensionNames = extensions;
+
+    // checkpoint 1 error here trying to research how to do it in zig idiomatic
+    // const instance =
+    // to here
 
     var running = true;
     var event: sdl.SDL_Event = undefined;
