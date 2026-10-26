@@ -123,6 +123,16 @@ pub fn build(b: *std.Build) void {
     // A run step that will run the test executable.
     const run_mod_tests = b.addRunArtifact(mod_tests);
 
+    // import
+    exe.root_module.addImport("sdl", b.createModule(.{
+        .root_source_file = b.path("src/sdl.zig"),
+        .target = target,
+        .optimize = optimize,
+        .link_libc = true,
+    }));
+
+    exe.root_module.linkSystemLibrary("SDL3", .{});
+
     // Creates an executable that will run `test` blocks from the executable's
     // root module. Note that test executables only test one module at a time,
     // hence why we have to create two separate ones.
